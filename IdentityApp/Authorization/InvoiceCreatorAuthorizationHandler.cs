@@ -21,7 +21,7 @@ namespace IdentityApp.Authorization
             if(context.User == null && invoice == null)
                 return Task.CompletedTask;
 
-            if(requirement.Name != Constants.CreateOperationName &&
+            if( requirement.Name != Constants.CreateOperationName &&
                 requirement.Name != Constants.ReadOperationName &&
                 requirement.Name != Constants.UpdateOperationName &&
                 requirement.Name != Constants.DeleteOperationName)
