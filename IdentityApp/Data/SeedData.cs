@@ -31,5 +31,30 @@ namespace IdentityApp.Data
 
             return user.Id;
         }
+
+        private static async Task<IdentityResult> EnsureRole(IServiceProvider serviceProvider, string uid, string role)
+        {
+            var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
+
+            IdentityResult ir;
+
+            if(await roleManager.RoleExistsAsync(role) == false)
+            {
+                ir = await roleManager.CreateAsync(new IdentityRole(role));
+            }
+
+            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+
+            var user = await userManager.FindByIdAsync(uid);
+            
+            if (user == null)
+            {
+                throw new Exception("User not existing");
+            }
+
+            ir = await userManager.AddToRoleAsync(user, role);
+
+            return ir;
+        }
     }
 }
