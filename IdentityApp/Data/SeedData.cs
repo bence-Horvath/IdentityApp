@@ -1,12 +1,24 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using IdentityApp.Authorization;
 
 namespace IdentityApp.Data
 {
     public class SeedData
     {
 
+        public static async Task Initialize(IServiceProvider serviceProvider, string password = "Test!321")
+        {
+            using (var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>())) 
+            {
 
-        private static async Task<string> EnsureUser(IServiceProvider serviceProvider, string initPw, string userName)
+                //Manager
+                var managerUid = await EnsureUser(serviceProvider, "manager123@demo.com", password);
+                await EnsureRole(serviceProvider, managerUid, Constants.InvoiceManagersRole);
+            }
+        }
+
+        private static async Task<string> EnsureUser(IServiceProvider serviceProvider, string userName, string initPw)
         {
             var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
 
