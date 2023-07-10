@@ -43,10 +43,40 @@ namespace IdentityApp.Pages.Invoices
 
             var isManager = User.IsInRole(Constants.InvoiceManagersRole);
 
-            if (!isCreator.Succeeded && !isManager)
+            var isAdmin = User.IsInRole(Constants.InvoiceAdminRole);
+
+            if (!isCreator.Succeeded && !isManager && !isAdmin)
                 return Forbid();
 
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync(int? id, InvoiceStatus status)
+        {
+
+            Invoice = await Context.Invoice.FindAsync(id);
+
+            if(Invoice == null)
+            {
+                return NotFound();
+            }
+
+            var invoiceOperation = status == InvoiceStatus.Approved ? InvoiceOperations.Approved : InvoiceOperations.Rejected;
+
+            var isAuthorized = await AuthorizationService.AuthorizeAsync(User, Invoice, invoiceOperation);
+
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
+            Invoice.Status = status;
+            Context.Invoice.Update(Invoice);
+            Context.SaveChanges();
+
+            return RedirectToPage("./Index");
+
+
         }
     }
 }

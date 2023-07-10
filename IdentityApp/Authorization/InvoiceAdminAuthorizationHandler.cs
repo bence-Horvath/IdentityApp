@@ -4,24 +4,19 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace IdentityApp.Authorization
 {
-    public class InvoiceAdminAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, Invoice>
+    public class InvoiceManagerAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, Invoice>
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, Invoice invoice)
         {
             if(context.User == null || invoice == null)
                 return Task.CompletedTask;
 
-            if (
-                    requirement.Name != Constants.UpdateOperationName &&
-                    requirement.Name != Constants.DeleteOperationName &&
-                    requirement.Name != Constants.CreateOperationName &&
-                    requirement.Name != Constants.ReadOperationName &&
-                    requirement.Name != Constants.RejectedOperationName &&
+            if (    requirement.Name != Constants.RejectedOperationName &&
                     requirement.Name != Constants.ApprovedOperationName
                )
                 return Task.CompletedTask;
 
-            if (context.User.IsInRole(Constants.InvoiceAdminRole))
+            if (context.User.IsInRole(Constants.InvoiceManagersRole))
                 context.Succeed(requirement);
 
             return Task.CompletedTask;

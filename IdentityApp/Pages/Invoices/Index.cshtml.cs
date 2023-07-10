@@ -34,11 +34,15 @@ namespace IdentityApp.Pages.Invoices
 
                 var isManager = User.IsInRole(Constants.InvoiceManagersRole);
 
+                var isAdmin = User.IsInRole(Constants.InvoiceAdminRole);
+
                 var currentUserID = UserManager.GetUserId(User);
 
 
-                if(!isManager)
+                if(!isManager && !isAdmin)
+                {
                     invoices = invoices.Where(i => i.CreatorId == currentUserID);
+                }
 
 
                 Invoice = await invoices.ToListAsync();
